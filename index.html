@@ -207,109 +207,73 @@ const timer = setInterval(() => {
         });
     }
 }, 1000);
-</script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-// BẮT ĐẦU ĐẾM NGƯỢC
+    const intro = document.getElementById("intro");
+    const countdown = document.getElementById("countdown");
+    const videoScreen = document.getElementById("videoScreen");
+    const video = document.getElementById("myVideo");
+    const error = document.getElementById("error");
 
-const timer = setInterval(() => {
-
-    number--;
-
-    if (number > 0) {
-
-        countdown.textContent = number;
-
-        countdown.style.animation = "none";
-        void countdown.offsetWidth;
-        countdown.style.animation = "zoom 1s ease";
-
-    } else {
-
-        clearInterval(timer);
-
-        // ẨN ẢNH NỀN
-
-        intro.style.display = "none";
-
-        // HIỆN VIDEO
-
-        videoScreen.style.display = "flex";
-
-        // CÀI ĐẶT ÂM THANH
-
-        video.muted = false;
-        video.volume = 1;
-        video.controls = true;
-
-        // TẢI VIDEO
-
-        video.load();
-
-        // KHI VIDEO ĐÃ TẢI
-
-        video.onloadeddata = async () => {
-
-            // THỬ PHÁT VIDEO CÓ TIẾNG
-
-            try {
-
-                await video.play();
-
-            } catch (e) {
-
-                console.log(
-                    "Trình duyệt chặn tự phát:",
-                    e
-                );
-
-                video.controls = true;
-
-            }
-
-            // THỬ BẬT TOÀN MÀN HÌNH
-
-            try {
-
-                if (videoScreen.requestFullscreen) {
-
-                    await videoScreen.requestFullscreen();
-
-                } else if (videoScreen.webkitRequestFullscreen) {
-
-                    videoScreen.webkitRequestFullscreen();
-
-                } else if (video.webkitEnterFullscreen) {
-
-                    video.webkitEnterFullscreen();
-
-                }
-
-            } catch (e) {
-
-                console.log(
-                    "Không thể tự bật toàn màn hình:",
-                    e
-                );
-
-            }
-
-        };
-
-        // NẾU VIDEO BỊ LỖI
-
-        video.onerror = () => {
-
-            videoScreen.style.display = "none";
-            error.style.display = "flex";
-
-        };
-
+    if (!intro || !countdown || !videoScreen || !video) {
+        console.error("Không tìm thấy thành phần website!");
+        return;
     }
 
-}, 1000);
+    let number = 3;
 
+    // HIỂN THỊ SỐ ĐẾM
+    function countDown() {
+
+        if (number > 0) {
+
+            countdown.textContent = number;
+
+            countdown.style.animation = "none";
+            void countdown.offsetWidth;
+            countdown.style.animation = "zoom 1s ease";
+
+            number--;
+
+            setTimeout(countDown, 1000);
+
+        } else {
+
+            // KẾT THÚC ĐẾM NGƯỢC
+            intro.style.display = "none";
+            videoScreen.style.display = "flex";
+
+            // CHUẨN BỊ VIDEO
+            video.muted = false;
+            video.volume = 1;
+            video.controls = true;
+            video.load();
+
+            // THỬ PHÁT VIDEO
+            video.play().catch(function (err) {
+                console.log("Trình duyệt chặn tự phát:", err);
+                video.controls = true;
+            });
+
+        }
+    }
+
+    // BẮT ĐẦU
+    countDown();
+
+    // KIỂM TRA LỖI VIDEO
+    video.addEventListener("error", function () {
+        if (error) {
+            error.style.display = "flex";
+            videoScreen.style.display = "none";
+        }
+    });
+
+});
 </script>
+
 
 </body>
 </html>
