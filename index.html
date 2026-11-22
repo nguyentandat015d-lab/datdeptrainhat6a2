@@ -141,15 +141,74 @@ html, body {
 
 <script>
 
+
+<script>
 const intro = document.getElementById("intro");
 const countdown = document.getElementById("countdown");
-
 const videoScreen = document.getElementById("videoScreen");
 const video = document.getElementById("myVideo");
 
-const error = document.getElementById("error");
-
 let number = 3;
+
+const timer = setInterval(() => {
+    number--;
+
+    if (number > 0) {
+        countdown.textContent = number;
+        countdown.style.animation = "none";
+        void countdown.offsetWidth;
+        countdown.style.animation = "zoom 1s ease";
+    } else {
+        clearInterval(timer);
+
+        intro.style.display = "none";
+        videoScreen.style.display = "flex";
+
+        video.muted = false;
+        video.volume = 1;
+        video.load();
+
+        video.play().catch(() => {
+            videoScreen.innerHTML = `
+                <div style="
+                    color:white;
+                    text-align:center;
+                    padding:20px;
+                ">
+                    <h2>Video đã sẵn sàng!</h2>
+                    <p style="margin:15px">
+                        Nhấn bên dưới để xem video có âm thanh
+                    </p>
+                    <button onclick="
+                        const v=document.getElementById('myVideo');
+                        v.muted=false;
+                        v.volume=1;
+                        v.play();
+                        this.style.display='none';
+                    " style="
+                        padding:16px 28px;
+                        font-size:18px;
+                        border:0;
+                        border-radius:12px;
+                        background:#ffffff;
+                        color:#000;
+                        font-weight:bold;
+                        cursor:pointer;
+                    ">
+                        🔊 BẬT ÂM THANH
+                    </button>
+                    <video id="myVideo"
+                        playsinline controls
+                        style="display:none">
+                        <source src="./video.mp4" type="video/mp4">
+                    </video>
+                </div>
+            `;
+        });
+    }
+}, 1000);
+</script>
+
 
 // BẮT ĐẦU ĐẾM NGƯỢC
 
