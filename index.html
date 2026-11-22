@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#000000">
+
 <title>Surprise 6A2</title>
 
 <style>
@@ -22,7 +23,7 @@ html, body {
     font-family: Arial, sans-serif;
 }
 
-/* MÀN HÌNH ĐẾM NGƯỢC */
+/* ẢNH NỀN ĐẾM NGƯỢC */
 
 #intro {
     position: fixed;
@@ -72,27 +73,53 @@ html, body {
 #videoScreen {
     position: fixed;
     inset: 0;
-
     display: none;
     justify-content: center;
     align-items: center;
-
     background: black;
 }
 
 #myVideo {
     width: 100%;
     height: 100%;
-
     object-fit: contain;
     background: black;
+}
+
+/* NÚT BẬT TIẾNG DỰ PHÒNG */
+
+#soundPrompt {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 18px;
+
+    color: white;
+    text-align: center;
+    background: #000b;
+    padding: 20px;
+}
+
+#soundPrompt button {
+    padding: 16px 28px;
+    border: none;
+    border-radius: 12px;
+    background: white;
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 /* THÔNG BÁO LỖI */
 
 #error {
     display: none;
-
     position: fixed;
     inset: 0;
 
@@ -101,7 +128,6 @@ html, body {
 
     color: white;
     background: black;
-
     text-align: center;
     padding: 25px;
     font-size: 18px;
@@ -111,13 +137,13 @@ html, body {
 
 <body>
 
-<!-- ẢNH NỀN VÀ ĐẾM NGƯỢC -->
+<!-- MÀN HÌNH ĐẾM NGƯỢC -->
 
 <div id="intro">
     <div id="countdown">3</div>
 </div>
 
-<!-- VIDEO -->
+<!-- MÀN HÌNH VIDEO -->
 
 <div id="videoScreen">
 
@@ -130,9 +156,20 @@ html, body {
         <source src="./video.mp4" type="video/mp4">
     </video>
 
+    <!-- NÚT BẬT TIẾNG NẾU TRÌNH DUYỆT CHẶN -->
+
+    <div id="soundPrompt">
+        <h2>Video đã sẵn sàng!</h2>
+        <p>Nhấn bên dưới để phát video có âm thanh.</p>
+
+        <button id="soundButton">
+            🔊 BẬT ÂM THANH
+        </button>
+    </div>
+
 </div>
 
-<!-- LỖI VIDEO -->
+<!-- THÔNG BÁO LỖI -->
 
 <div id="error">
     Không thể tải video!<br>
@@ -141,139 +178,104 @@ html, body {
 
 <script>
 
+// LẤY CÁC THÀNH PHẦN
 
-<script>
 const intro = document.getElementById("intro");
 const countdown = document.getElementById("countdown");
 const videoScreen = document.getElementById("videoScreen");
 const video = document.getElementById("myVideo");
+const error = document.getElementById("error");
+const soundPrompt = document.getElementById("soundPrompt");
+const soundButton = document.getElementById("soundButton");
+
+// BẮT ĐẦU ĐẾM NGƯỢC
 
 let number = 3;
 
-const timer = setInterval(() => {
-    number--;
+function countDown() {
 
-    if (number > 0) {
-        countdown.textContent = number;
-        countdown.style.animation = "none";
-        void countdown.offsetWidth;
-        countdown.style.animation = "zoom 1s ease";
+    countdown.textContent = number;
+
+    countdown.style.animation = "none";
+    void countdown.offsetWidth;
+    countdown.style.animation = "zoom 1s ease";
+
+    if (number > 1) {
+
+        number--;
+
+        setTimeout(countDown, 1000);
+
     } else {
-        clearInterval(timer);
 
-        intro.style.display = "none";
-        videoScreen.style.display = "flex";
+        setTimeout(startVideo, 1000);
 
-        video.muted = false;
-        video.volume = 1;
-        video.load();
-
-        video.play().catch(() => {
-            videoScreen.innerHTML = `
-                <div style="
-                    color:white;
-                    text-align:center;
-                    padding:20px;
-                ">
-                    <h2>Video đã sẵn sàng!</h2>
-                    <p style="margin:15px">
-                        Nhấn bên dưới để xem video có âm thanh
-                    </p>
-                    <button onclick="
-                        const v=document.getElementById('myVideo');
-                        v.muted=false;
-                        v.volume=1;
-                        v.play();
-                        this.style.display='none';
-                    " style="
-                        padding:16px 28px;
-                        font-size:18px;
-                        border:0;
-                        border-radius:12px;
-                        background:#ffffff;
-                        color:#000;
-                        font-weight:bold;
-                        cursor:pointer;
-                    ">
-                        🔊 BẬT ÂM THANH
-                    </button>
-                    <video id="myVideo"
-                        playsinline controls
-                        style="display:none">
-                        <source src="./video.mp4" type="video/mp4">
-                    </video>
-                </div>
-            `;
-        });
     }
-}, 1000);
+}
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+// CHUYỂN SANG VIDEO
 
-    const intro = document.getElementById("intro");
-    const countdown = document.getElementById("countdown");
-    const videoScreen = document.getElementById("videoScreen");
-    const video = document.getElementById("myVideo");
-    const error = document.getElementById("error");
+function startVideo() {
 
-    if (!intro || !countdown || !videoScreen || !video) {
-        console.error("Không tìm thấy thành phần website!");
-        return;
-    }
+    intro.style.display = "none";
+    videoScreen.style.display = "flex";
 
-    let number = 3;
+    video.muted = false;
+    video.volume = 1;
 
-    // HIỂN THỊ SỐ ĐẾM
-    function countDown() {
+    video.load();
 
-        if (number > 0) {
+    // THỬ TỰ PHÁT CÓ TIẾNG
 
-            countdown.textContent = number;
+    video.play().then(() => {
 
-            countdown.style.animation = "none";
-            void countdown.offsetWidth;
-            countdown.style.animation = "zoom 1s ease";
+        soundPrompt.style.display = "none";
 
-            number--;
+    }).catch((err) => {
 
-            setTimeout(countDown, 1000);
+        console.log("Trình duyệt chặn tự phát:", err);
 
-        } else {
+        soundPrompt.style.display = "flex";
 
-            // KẾT THÚC ĐẾM NGƯỢC
-            intro.style.display = "none";
-            videoScreen.style.display = "flex";
-
-            // CHUẨN BỊ VIDEO
-            video.muted = false;
-            video.volume = 1;
-            video.controls = true;
-            video.load();
-
-            // THỬ PHÁT VIDEO
-            video.play().catch(function (err) {
-                console.log("Trình duyệt chặn tự phát:", err);
-                video.controls = true;
-            });
-
-        }
-    }
-
-    // BẮT ĐẦU
-    countDown();
-
-    // KIỂM TRA LỖI VIDEO
-    video.addEventListener("error", function () {
-        if (error) {
-            error.style.display = "flex";
-            videoScreen.style.display = "none";
-        }
     });
 
-});
-</script>
+}
 
+// NÚT BẬT ÂM THANH DỰ PHÒNG
+
+soundButton.addEventListener("click", async function () {
+
+    video.muted = false;
+    video.volume = 1;
+
+    try {
+
+        await video.play();
+
+        soundPrompt.style.display = "none";
+
+    } catch (err) {
+
+        alert("Không thể phát video. Hãy kiểm tra lại file video.mp4.");
+
+    }
+
+});
+
+// KIỂM TRA LỖI VIDEO
+
+video.addEventListener("error", function () {
+
+    videoScreen.style.display = "none";
+    error.style.display = "flex";
+
+});
+
+// CHẠY WEBSITE
+
+countDown();
+
+</script>
 
 </body>
 </html>
