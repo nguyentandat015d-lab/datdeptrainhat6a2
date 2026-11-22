@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
 <title>Surprise 6A2</title>
 
 <style>
@@ -22,15 +23,18 @@ html, body {
 }
 
 /* MÀN HÌNH ĐẾM NGƯỢC */
+
 #intro {
     position: fixed;
     inset: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+
     background:
         linear-gradient(#0003, #0005),
         url("./background.png") center center / cover no-repeat;
+
     z-index: 10;
 }
 
@@ -38,9 +42,11 @@ html, body {
     color: white;
     font-size: clamp(100px, 25vw, 220px);
     font-weight: 900;
+
     text-shadow:
         0 0 15px white,
         0 0 40px #00aaff;
+
     animation: zoom 1s ease;
 }
 
@@ -49,10 +55,12 @@ html, body {
         opacity: 0;
         transform: scale(2);
     }
+
     60% {
         opacity: 1;
         transform: scale(0.9);
     }
+
     100% {
         opacity: 1;
         transform: scale(1);
@@ -60,31 +68,40 @@ html, body {
 }
 
 /* MÀN HÌNH VIDEO */
+
 #videoScreen {
     position: fixed;
     inset: 0;
+
     display: none;
     justify-content: center;
     align-items: center;
+
     background: black;
 }
 
 #myVideo {
     width: 100%;
     height: 100%;
+
     object-fit: contain;
     background: black;
 }
 
 /* THÔNG BÁO LỖI */
+
 #error {
     display: none;
+
     position: fixed;
     inset: 0;
-    color: white;
-    background: black;
+
     justify-content: center;
     align-items: center;
+
+    color: white;
+    background: black;
+
     text-align: center;
     padding: 25px;
     font-size: 18px;
@@ -94,38 +111,54 @@ html, body {
 
 <body>
 
-<!-- MÀN HÌNH ĐẾM NGƯỢC -->
+<!-- ẢNH NỀN VÀ ĐẾM NGƯỢC -->
+
 <div id="intro">
     <div id="countdown">3</div>
 </div>
 
-<!-- MÀN HÌNH VIDEO -->
+<!-- VIDEO -->
+
 <div id="videoScreen">
-    <video id="myVideo" playsinline controls preload="auto">
+
+    <video
+        id="myVideo"
+        playsinline
+        controls
+        preload="auto"
+    >
         <source src="./video.mp4" type="video/mp4">
     </video>
+
 </div>
+
+<!-- LỖI VIDEO -->
 
 <div id="error">
     Không thể tải video!<br>
-    Hãy kiểm tra lại file video.mp4 trên GitHub.
+    Hãy kiểm tra file video.mp4 trên GitHub.
 </div>
 
 <script>
+
 const intro = document.getElementById("intro");
 const countdown = document.getElementById("countdown");
+
 const videoScreen = document.getElementById("videoScreen");
 const video = document.getElementById("myVideo");
+
 const error = document.getElementById("error");
 
 let number = 3;
 
-// HIỆU ỨNG ĐẾM NGƯỢC
+// BẮT ĐẦU ĐẾM NGƯỢC
+
 const timer = setInterval(() => {
 
     number--;
 
     if (number > 0) {
+
         countdown.textContent = number;
 
         countdown.style.animation = "none";
@@ -137,39 +170,82 @@ const timer = setInterval(() => {
         clearInterval(timer);
 
         // ẨN ẢNH NỀN
+
         intro.style.display = "none";
 
         // HIỆN VIDEO
+
         videoScreen.style.display = "flex";
 
-        // CHUẨN BỊ VIDEO
-        video.muted = true;
+        // CÀI ĐẶT ÂM THANH
+
+        video.muted = false;
+        video.volume = 1;
+        video.controls = true;
+
+        // TẢI VIDEO
+
         video.load();
 
-        // KHI VIDEO TẢI ĐƯỢC
-        video.onloadeddata = () => {
+        // KHI VIDEO ĐÃ TẢI
 
-            video.play().then(() => {
+        video.onloadeddata = async () => {
 
-                // THỬ TOÀN MÀN HÌNH
-                const fullscreen =
-                    videoScreen.requestFullscreen ||
-                    videoScreen.webkitRequestFullscreen;
+            // THỬ PHÁT VIDEO CÓ TIẾNG
 
-                if (fullscreen) {
-                    fullscreen.call(videoScreen).catch(() => {});
+            try {
+
+                await video.play();
+
+            } catch (e) {
+
+                console.log(
+                    "Trình duyệt chặn tự phát:",
+                    e
+                );
+
+                video.controls = true;
+
+            }
+
+            // THỬ BẬT TOÀN MÀN HÌNH
+
+            try {
+
+                if (videoScreen.requestFullscreen) {
+
+                    await videoScreen.requestFullscreen();
+
+                } else if (videoScreen.webkitRequestFullscreen) {
+
+                    videoScreen.webkitRequestFullscreen();
+
+                } else if (video.webkitEnterFullscreen) {
+
+                    video.webkitEnterFullscreen();
+
                 }
 
-            }).catch(() => {
-                video.controls = true;
-            });
+            } catch (e) {
+
+                console.log(
+                    "Không thể tự bật toàn màn hình:",
+                    e
+                );
+
+            }
+
         };
 
         // NẾU VIDEO BỊ LỖI
+
         video.onerror = () => {
+
             videoScreen.style.display = "none";
             error.style.display = "flex";
+
         };
+
     }
 
 }, 1000);
